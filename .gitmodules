@@ -1,0 +1,3 @@
+[submodule "segmenter"]
+	path = segmenter
+	url = https://github.com/rstrudel/segmenter.git
