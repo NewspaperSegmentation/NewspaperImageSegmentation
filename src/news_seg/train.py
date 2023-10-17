@@ -18,6 +18,10 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter  # type: ignore
 from tqdm import tqdm
 
+# pylint: disable-next=import-error
+from news_seg.models.segmenter_wrapper import SegmenterWrapper
+from segmenter.segm import config
+from segmenter.segm.model.factory import create_segmenter
 from src.news_seg.models.dh_segment_small import DhSegmentSmall
 from src.news_seg.models.dh_segment import DhSegment
 from src.news_seg.models.dh_segment_cbam import DhSegmentCBAM
@@ -95,6 +99,17 @@ def init_model(load: Union[str, None], device: str, model_str: str, freeze: bool
             in_channels=IN_CHANNELS, out_channel=OUT_CHANNELS, load_resnet_weights=True
         )
         model = setup_dh_segment(device, load, model, freeze)
+    elif model_str == "segmenter":
+        cfg = config.load_config()
+        model_cfg = cfg["model"]["vit_small_patch16_384"]
+        model_cfg["image_size"] = (512, 512)
+        model_cfg["backbone"] = "vit_small_patch16_384"
+        model_cfg["dropout"] = 0.0
+        model_cfg["drop_path_rate"] = 0.0
+        model_cfg["decoder"] = cfg["decoder"]["mask_transformer"]
+
+        model = SegmenterWrapper(create_segmenter(model_cfg))
+
     assert model, "No valid model string supplied in model parameter"
     return model
 
