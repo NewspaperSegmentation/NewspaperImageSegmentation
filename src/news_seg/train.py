@@ -108,7 +108,7 @@ def init_model(load: Union[str, None], device: str, model_str: str, freeze: bool
         model_cfg["drop_path_rate"] = 0.0
         model_cfg["decoder"] = cfg["decoder"]["mask_transformer"]
 
-        model = SegmenterWrapper(create_segmenter(model_cfg))
+        model = SegmenterWrapper(create_segmenter(model_cfg), in_channels=IN_CHANNELS)
 
     assert model, "No valid model string supplied in model parameter"
     return model
